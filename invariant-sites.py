@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Script by JK
 
 # Usage
 import argparse
@@ -44,11 +45,11 @@ def check_fasta(f):
 
 parser = argparse.ArgumentParser(
 	formatter_class=RawTextHelpFormatter,
-	description='Counts invariant/variant and masks variant sites from multi-FASTA alignment\n',
+	description='Counts and masks non-invariant sites from multi-FASTA alignment\n',
 	usage='\n  %(prog)s [--out invariant.fa] FASTA')
 parser.add_argument('fasta', metavar='FASTA', nargs=1, help='original multi-FASTA alignment file')
-parser.add_argument('--out', metavar='FILE', nargs=1, help='specify output file with variant sites masked')
-parser.add_argument('--mask', metavar='X', default='X', nargs=1, help='symbol to use for masking; change this if the alignment already contains this symbol (default=X)')
+parser.add_argument('--out', metavar='FILE', nargs=1, help='specify output file with non-invariant sites masked')
+parser.add_argument('--mask', metavar='X', default='X', nargs=1, help='symbol to use for masking (default=X)')
 parser.add_argument('--version', action='version', version='%(prog)s v0.1')
 args = parser.parse_args()
 
@@ -68,13 +69,12 @@ for record in SeqIO.parse(args.fasta[0], 'fasta'):
 	seqlist.append(list(record.seq.upper()))
 
 # Import into pandas dataframe
-msg('Converting to dataframe and counting sites ... please wait')
+msg('Converting to dataframe and counting invariant sites ... please wait')
 df = pd.DataFrame(seqlist)
 
-#print(df)
-# Mask variant sites as '-'
+# Mask non-invariant sites including Ns and gaps
 for col in df:
-	if len(set(df[col])) > 1:
+	if bool(re.search('[^ACGT]', ''.join(set(df[col])))) or len(set(df[col])) > 1:
 		df[col] = args.mask[0]
 
 # Export 1st row as consensus (given they are all the same after masking variants)
@@ -96,4 +96,3 @@ if args.out:
 	SeqIO.write(newseqs, args.out[0], 'fasta')
 
 sys.exit(0)
-
