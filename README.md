@@ -6,8 +6,9 @@ Counts invariant/variant and masks variant sites from multi-FASTA alignment
 Jason Kwong (@kwongjc)
 
 ## Dependencies
-* Python 2.7.x
+* Python 3.x
 * BioPython
+* Pandas
 
 ## Usage
 
