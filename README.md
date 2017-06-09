@@ -23,8 +23,8 @@ positional arguments:
 
 optional arguments:
   -h, --help  show this help message and exit
-  --out FILE  specify output file with variant sites masked (default = stdout)
-  --mask N    symbol to use for masking; change this if the alignment already contains this symbol
+  --out FILE  specify output file with variant sites masked
+  --mask X    symbol to use for masking; change this if the alignment already contains this symbol (default=X)
   --version   show program's version number and exit
 ```
 

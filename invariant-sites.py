@@ -47,8 +47,8 @@ parser = argparse.ArgumentParser(
 	description='Counts invariant/variant and masks variant sites from multi-FASTA alignment\n',
 	usage='\n  %(prog)s [--out invariant.fa] FASTA')
 parser.add_argument('fasta', metavar='FASTA', nargs=1, help='original multi-FASTA alignment file')
-parser.add_argument('--out', metavar='FILE', nargs=1, help='specify output file with variant sites masked (default = stdout)')
-parser.add_argument('--mask', metavar='N', default='N', nargs=1, help='symbol to use for masking; change this if the alignment already contains this symbol')
+parser.add_argument('--out', metavar='FILE', nargs=1, help='specify output file with variant sites masked')
+parser.add_argument('--mask', metavar='X', default='X', nargs=1, help='symbol to use for masking; change this if the alignment already contains this symbol (default=X)')
 parser.add_argument('--version', action='version', version='%(prog)s v0.1')
 args = parser.parse_args()
 
@@ -81,8 +81,10 @@ for col in df:
 newseq = df.iloc[0].tolist()
 
 # Count nucleotides and variant sites in sequence
-for site in Counter(newseq):
-	print(''.join([site, ': ', str(Counter(newseq)[site])]))
+bases = list(Counter(newseq))
+bases.sort()
+for nt in bases:
+	print(''.join([nt, ': ', str(Counter(newseq)[nt])]))
 
 # Export masked sequences to FASTA output
 newseqs = []
