@@ -10,8 +10,10 @@ import re
 from Bio import Seq
 from Bio import SeqIO
 from Bio.SeqRecord import SeqRecord
+from Bio import AlignIO
 import pandas as pd
 from pandas import DataFrame
+import numpy as np
 from collections import Counter
 
 # Functions
@@ -62,17 +64,13 @@ if args.out:
 	if check_file(args.out[0]):
 		err('ERROR: "{}" already exists.'.format(args.out[0]))
 
-# Parse sequences as lists
-seqlist = []
-for record in SeqIO.parse(args.fasta[0], 'fasta'):
-	msg('Reading {} ...'.format(record.id))
-	seqlist.append(list(record.seq.upper()))
+# Read alignment into pandas dataframe
+msg('Reading {} into dataframe ... please wait'.format(args.fasta[0]))
+aln = AlignIO.read(args.fasta[0], 'fasta')
+df = pd.DataFrame(np.array([list(record) for record in aln], np.character, order="F"), dtype=str)
 
-# Import into pandas dataframe
-msg('Converting to dataframe and counting invariant sites ... please wait')
-df = pd.DataFrame(seqlist)
-
-# Mask non-invariant sites including Ns and gaps
+# Iterate through each column to mask columns containing non-invariant sites including Ns and gaps
+msg('Masking non-invariant sites ...')
 for col in df:
 	if bool(re.search('[^ACGT]', ''.join(set(df[col])))) or len(set(df[col])) > 1:
 		df[col] = args.mask[0]
@@ -81,6 +79,7 @@ for col in df:
 newseq = df.iloc[0].tolist()
 
 # Count nucleotides and variant sites in sequence
+print('Column counts by nucleotide: (non-invariant = {})'.format(args.mask[0]))
 bases = list(Counter(newseq))
 bases.sort()
 for nt in bases:
