@@ -39,7 +39,7 @@ def check_fasta(f):
 			line = line.strip()
 			if not line or line[0] == '>':	
 				continue
-			if bool(re.search('[^ACTGactgNn\-]', line)):	# Check if there are non-nucleotide characters in sequence
+			if bool(re.search('[^ACTGactgNn\?\-]', line)):	# Check if there are non-nucleotide characters in sequence
 				return False
 	return True
 
@@ -83,8 +83,12 @@ newseq = df.iloc[0].tolist()
 # Count nucleotides and variant sites in sequence
 bases = list(Counter(newseq))
 bases.sort()
+counts = {}
 for nt in bases:
-	print(''.join([nt, ': ', str(Counter(newseq)[nt])]))
+	counts[nt] = Counter(newseq)[nt]
+	print(''.join([nt, ': ', str(counts[nt])]))
+print('Total sites: {}'.format(len(newseq)))
+print('Proportion invariant = {}'.format(round((counts['A']+counts['C']+counts['G']+counts['T'])/len(newseq),4)))
 
 # Export masked sequences to FASTA output
 newseqs = []
